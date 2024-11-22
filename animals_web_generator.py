@@ -8,6 +8,7 @@ def load_data(file_path):
 def generate_animal_info(data):
     output = ''
     for animal in data:
+        output += '<li class="cards__item">\n'
         if 'name' in animal:
             output += f"Name: {animal['name']}<br>\n"
         if 'characteristics' in animal and 'diet' in animal['characteristics']:
@@ -16,7 +17,7 @@ def generate_animal_info(data):
             output += f"Location: {animal['locations'][0]}<br>\n"
         if 'characteristics' in animal and 'type' in animal['characteristics']:
             output += f"Type: {animal['characteristics']['type']}<br>\n"
-        output += "<br>\n"  # Add a blank line between animals
+        output += '</li>\n'
     return output
 
 
