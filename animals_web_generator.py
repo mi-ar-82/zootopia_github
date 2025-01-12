@@ -2,28 +2,26 @@ import json
 
 
 # Loads animal data from a JSON file.
-def load_data(file_path):
+def load_data(filepath):
     """Loads animal data from a JSON file.
 
     Args:
-        file_path (str): The path to the JSON file.
+        filepath (str): The path to the JSON file.
 
     Returns:
-         dict: A dictionary containing the animal data,
-         or None if an error occurs.
+        list: A list of animal dictionaries.
     """
-    print(f"Loading animal data from '{file_path}'...")
+    print(f"Loading animal data from '{filepath}'...")
     try:
-        with open(file_path, "r") as handle:
-            data = json.load(handle)
-            print("Animal data loaded successfully.")
-            return data
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        return data
     except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-        return None
+        print(f"Error: File '{filepath}' not found.")
+        raise
     except json.JSONDecodeError:
-        print(f"Error: Invalid JSON data in '{file_path}'.")
-        return None
+        print(f"Error: File '{filepath}' contains invalid JSON.")
+        raise
 
 
 # Serializes an animal object into an HTML list item.
@@ -32,6 +30,12 @@ def serialize_animal(animal_obj):
 
     Args:
         animal_obj (dict): A dictionary containing the animal's information.
+        Expected keys include:
+            - 'name' (str): The name of the animal.
+            - 'characteristics' (dict, optional):
+             A dictionary with keys like 'diet' and 'type'.
+            - 'locations' (list, optional): A list of strings
+            representing locations where the animal can be found.
 
     Returns:
         str: An HTML list item representing the animal.
@@ -44,14 +48,18 @@ def serialize_animal(animal_obj):
     # Serialize characteristics if they exist
     if 'characteristics' in animal_obj:
         if 'diet' in animal_obj['characteristics']:
-            output += f'  <strong>Diet:</strong> {animal_obj["characteristics"]["diet"]}<br>\n'
+            output += (f'      <strong>Diet:</strong> '
+                       f'{animal_obj["characteristics"]["diet"]}<br>\n')
         if 'type' in animal_obj['characteristics']:
-            output += f'  <strong>Type:</strong> {animal_obj["characteristics"]["type"]}<br>\n'
+            output += (f'      <strong>Type:</strong> '
+                       f'{animal_obj["characteristics"]["type"]}<br>\n')
 
     # Serialize locations if they exist
     if 'locations' in animal_obj and animal_obj['locations']:
-        output += f'  <strong>Location:</strong> {", ".join(animal_obj["locations"])}<br>\n'
+        output += (f'      <strong>Location:</strong> '
+                   f'{", ".join(animal_obj["locations"])}<br>\n')
 
+    output += '  </p>\n'
     output += '</li>'
     return output
 
@@ -98,6 +106,7 @@ def update_html_template(
               f"Output written to '{output_path}'.")
     except FileNotFoundError:
         print(f"Error: File '{template_path}' not found.")
+        raise
 
 
 def main():
@@ -106,9 +115,9 @@ def main():
     output_file_path = "animals.html"
 
     animals_data = load_data(json_file_path)
-
+    print("Loaded animal data:", animals_data)
     animals_info = generate_animal_cards(animals_data)
-
+    print("Generated HTML:", animals_info)
     update_html_template(template_file_path, output_file_path, animals_info)
 
 
